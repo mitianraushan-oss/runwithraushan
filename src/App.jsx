@@ -299,7 +299,11 @@ export default function RunWithRaushanSite() {
             </div>
             <div>
               <h4 className="font-bold mb-4">Links</h4>
-              <p className="text-gray-400 text-sm">YouTube • Instagram • Twitter</p>
+              <div className="flex flex-col gap-2 text-sm">
+                <a href="https://www.youtube.com/channel/UC83wrDjR5xOsfBfl4Nw8y9w" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition">YouTube</a>
+                <a href="https://www.instagram.com/mitianraushan/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition">Instagram</a>
+                <a href="https://www.linkedin.com/in/raushan-kumar-58305258" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition">LinkedIn</a>
+              </div>
             </div>
             <div>
               <h4 className="font-bold mb-4">Contact</h4>
