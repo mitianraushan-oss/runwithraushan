@@ -187,20 +187,30 @@ export default function RunWithRaushanSite() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-300 rounded-lg p-6">
           <Heart className="text-orange-600 mb-3" size={28} />
-          <h3 className="font-bold mb-2 text-orange-900">One-Time Donation</h3>
-          <p className="text-sm text-orange-700 mb-4">₹100 • ₹500 • ₹1000 • Custom</p>
-          <button className="w-full px-4 py-2 bg-orange-600 text-white rounded font-semibold hover:bg-orange-700">
-            Donate via UPI
-          </button>
+          <h3 className="font-bold mb-2 text-orange-900">Donate (India)</h3>
+          <p className="text-sm text-orange-700 mb-4">UPI • Cards • Net Banking • Any amount</p>
+          <a
+            href="https://razorpay.me/@raushankumaross"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full px-4 py-2 bg-orange-600 text-white rounded font-semibold text-center hover:bg-orange-700"
+          >
+            Donate via Razorpay
+          </a>
         </div>
 
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-300 rounded-lg p-6">
           <TrendingUp className="text-blue-600 mb-3" size={28} />
-          <h3 className="font-bold mb-2 text-blue-900">Become a Supporter</h3>
-          <p className="text-sm text-blue-700 mb-4">₹200/month • Get exclusive perks</p>
-          <button className="w-full px-4 py-2 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700">
-            Ko-fi / GitHub
-          </button>
+          <h3 className="font-bold mb-2 text-blue-900">Donate (International)</h3>
+          <p className="text-sm text-blue-700 mb-4">Credit/Debit card • PayPal balance • Any amount</p>
+          <a
+            href="https://paypal.me/raushankumar2804"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full px-4 py-2 bg-blue-600 text-white rounded font-semibold text-center hover:bg-blue-700"
+          >
+            Donate via PayPal
+          </a>
         </div>
       </div>
 
