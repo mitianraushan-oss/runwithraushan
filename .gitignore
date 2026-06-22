@@ -6,3 +6,7 @@ dist/
 *.log
 .vite/
 .vercel
+
+# Raw workout exports (personal GPS/heart-rate data) — keep local, never commit.
+# Only the aggregated src/data/stats.json is committed.
+data/*.csv

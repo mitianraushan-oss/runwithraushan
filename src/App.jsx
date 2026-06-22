@@ -1,5 +1,38 @@
-import React, { useState } from 'react';
-import { Heart, Play, TrendingUp, Users, MessageCircle, Mail, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { Heart, Play, TrendingUp, Users, MessageCircle, ChevronRight, Activity } from 'lucide-react';
+import stats from './data/stats.json';
+
+// Your public profiles. Paste the URLs and the buttons appear automatically;
+// leave a field empty to hide that link.
+const PROFILES = {
+  mapmyrun: '', // e.g. https://www.mapmyrun.com/profile/<your-id>
+  strava: '',   // e.g. https://www.strava.com/athletes/<your-id>
+};
+
+// Featured videos. The first two were auto-detected from your MapMyRun notes.
+// Add more by pasting a YouTube URL (watch, youtu.be, or /shorts all work).
+const videos = [
+  { title: '10K Run', url: 'https://youtube.com/shorts/61BgNYqWaRM', category: 'Run' },
+  { title: '5K Run', url: 'https://youtube.com/shorts/pBfHB3ZEqU4', category: 'Run' },
+  // { title: 'Your title here', url: 'https://youtu.be/xxxxxxxxxxx', category: 'Tips' },
+];
+
+// Pull the video id out of any common YouTube URL shape.
+const youTubeId = (url) => {
+  const m = String(url).match(/(?:v=|youtu\.be\/|\/shorts\/|\/embed\/)([\w-]{11})/);
+  return m ? m[1] : null;
+};
+const thumb = (url) => {
+  const id = youTubeId(url);
+  return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null;
+};
+
+// Number helpers for the stat tiles.
+const nf = (n) => n.toLocaleString('en-US');
+const compact = (n) =>
+  n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)}M`
+  : n >= 1_000 ? `${(n / 1_000).toFixed(1)}K`
+  : nf(n);
 
 export default function RunWithRaushanSite() {
   const [activeTab, setActiveTab] = useState('home');
@@ -13,11 +46,12 @@ export default function RunWithRaushanSite() {
     { id: 'support', label: 'Support' },
   ];
 
-  const videos = [
-    { id: 1, title: 'Morning 5K Run - Cubbon Park', views: '2.4K', category: 'Journey' },
-    { id: 2, title: 'Running Form Tips for Beginners', views: '5.8K', category: 'Tips' },
-    { id: 3, title: 'Recovery Stretches - Post Run', views: '1.2K', category: 'Recovery' },
-    { id: 4, title: 'Community Run Highlights', views: '3.1K', category: 'Community' },
+  // Headline tiles, all derived from your real MapMyRun export (src/data/stats.json).
+  const statTiles = [
+    { value: `${nf(stats.totals.distanceMi)} mi`, label: 'Total Distance', color: 'text-orange-600' },
+    { value: nf(stats.totals.workouts), label: 'Workouts Logged', color: 'text-blue-600' },
+    { value: `${nf(stats.totals.hours)} hrs`, label: 'Time Moving', color: 'text-teal-600' },
+    { value: compact(stats.totals.steps), label: 'Steps Taken', color: 'text-orange-600' },
   ];
 
   const leaderboard = [
@@ -45,19 +79,39 @@ export default function RunWithRaushanSite() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
-          <p className="text-3xl font-bold text-orange-600">250K+</p>
-          <p className="text-gray-600 text-sm">Miles Run</p>
+      {/* Stats — real numbers from MapMyRun */}
+      <div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {statTiles.map((s) => (
+            <div key={s.label} className="bg-white border border-gray-200 rounded-lg p-6 text-center">
+              <p className={`text-2xl sm:text-3xl font-bold ${s.color}`}>{s.value}</p>
+              <p className="text-gray-600 text-sm mt-1">{s.label}</p>
+            </div>
+          ))}
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
-          <p className="text-3xl font-bold text-blue-600">5K+</p>
-          <p className="text-gray-600 text-sm">Community Members</p>
+
+        {/* Highlights strip */}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-gray-600">
+          <span className="flex items-center gap-2">
+            <Activity size={16} className="text-orange-600" />
+            Running since {stats.sinceDate}
+          </span>
+          <span>🏅 Longest run: {stats.longest.distanceKm} km ({stats.longest.distanceMi} mi), {stats.longest.date}</span>
+          <span>{nf(stats.byType.Run || 0)} runs · {nf(stats.byType.Walk || 0)} walks</span>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
-          <p className="text-3xl font-bold text-teal-600">42</p>
-          <p className="text-gray-600 text-sm">Weekly Runs</p>
+
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-3 text-xs text-gray-500">
+          <span>Synced from MapMyRun · updated {stats.lastUpdated}</span>
+          {PROFILES.mapmyrun && (
+            <a href={PROFILES.mapmyrun} target="_blank" rel="noopener noreferrer" className="font-semibold text-orange-600 hover:text-orange-700">
+              MapMyRun profile →
+            </a>
+          )}
+          {PROFILES.strava && (
+            <a href={PROFILES.strava} target="_blank" rel="noopener noreferrer" className="font-semibold text-orange-600 hover:text-orange-700">
+              Strava profile →
+            </a>
+          )}
         </div>
       </div>
 
@@ -65,19 +119,8 @@ export default function RunWithRaushanSite() {
       <div>
         <h2 className="text-2xl sm:text-3xl font-bold mb-6">Latest Videos</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {videos.map(video => (
-            <div key={video.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition">
-              <div className="bg-gradient-to-br from-orange-400 to-blue-400 h-32 flex items-center justify-center">
-                <Play className="text-white" size={40} />
-              </div>
-              <div className="p-4">
-                <span className="inline-block px-3 py-1 bg-orange-100 text-orange-700 text-xs font-semibold rounded-full mb-2">
-                  {video.category}
-                </span>
-                <h3 className="font-semibold text-gray-900">{video.title}</h3>
-                <p className="text-sm text-gray-600 mt-2">{video.views} views</p>
-              </div>
-            </div>
+          {videos.map((video) => (
+            <VideoCard key={video.url} video={video} />
           ))}
         </div>
       </div>
@@ -100,9 +143,9 @@ export default function RunWithRaushanSite() {
       <div className="bg-white border border-gray-200 rounded-lg p-8">
         <h2 className="text-3xl font-bold mb-6">About RunWithRaushan</h2>
         <div className="space-y-4 text-gray-700">
-          <p>Hi, I'm Raushan. I believe that running is more than just exercise—it's a journey of personal growth, community, and inspiration.</p>
+          <p>Hi, I&apos;m Raushan. I believe that running is more than just exercise—it&apos;s a journey of personal growth, community, and inspiration.</p>
           <p>RunWithRaushan started as a personal mission to inspire people to move, connect, and improve their health. What began as weekend runs with friends has evolved into a thriving community of 5,000+ runners across different fitness levels.</p>
-          <p>Our mission: Create an inclusive, energetic community where every mile counts—for your health and others' wellbeing through Miles4Meals.</p>
+          <p>Our mission: Create an inclusive, energetic community where every mile counts—for your health and others&apos; wellbeing through Miles4Meals.</p>
         </div>
       </div>
 
@@ -167,7 +210,7 @@ export default function RunWithRaushanSite() {
       </div>
 
       <div className="bg-gradient-to-r from-teal-50 to-blue-50 border border-teal-200 rounded-lg p-8">
-        <h3 className="text-2xl font-bold mb-4">This Month's Challenge</h3>
+        <h3 className="text-2xl font-bold mb-4">This Month&apos;s Challenge</h3>
         <p className="text-gray-700 mb-4">50K Miles in June - Run or walk 50 kilometers this month and get featured on our community wall!</p>
         <div className="flex items-center gap-4">
           <div className="flex-1 bg-white rounded-full h-3">
@@ -238,7 +281,7 @@ export default function RunWithRaushanSite() {
 
       <div className="bg-gradient-to-r from-orange-500 to-blue-500 rounded-lg p-8 text-white">
         <h3 className="text-2xl font-bold mb-4">Ready to Join the Movement?</h3>
-        <p className="mb-6">Be part of a community that's changing lives, one mile at a time.</p>
+        <p className="mb-6">Be part of a community that&apos;s changing lives, one mile at a time.</p>
         <button className="px-8 py-3 bg-white text-orange-600 rounded-lg font-bold hover:bg-gray-100">
           Get Started Today
         </button>
@@ -246,11 +289,41 @@ export default function RunWithRaushanSite() {
     </div>
   );
 
+  // A video card: real YouTube thumbnail, opens the video on YouTube in a new tab.
+  const VideoCard = ({ video }) => {
+    const cover = thumb(video.url);
+    return (
+      <a
+        href={video.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group block bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition"
+      >
+        <div className="relative h-40 bg-gradient-to-br from-orange-400 to-blue-400 flex items-center justify-center">
+          {cover && (
+            <img src={cover} alt={video.title} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+          )}
+          <div className="relative flex items-center justify-center w-14 h-14 rounded-full bg-black/55 group-hover:bg-black/70 transition">
+            <Play className="text-white ml-1" size={26} fill="white" />
+          </div>
+        </div>
+        <div className="p-4">
+          {video.category && (
+            <span className="inline-block px-3 py-1 bg-orange-100 text-orange-700 text-xs font-semibold rounded-full mb-2">
+              {video.category}
+            </span>
+          )}
+          <h3 className="font-semibold text-gray-900">{video.title}</h3>
+        </div>
+      </a>
+    );
+  };
+
   // Render sections
   const renderSection = () => {
     switch(activeTab) {
       case 'about': return <AboutSection />;
-      case 'videos': return <div><h2 className="text-3xl font-bold mb-6">All Videos</h2><div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{videos.map(v => <div key={v.id} className="bg-white border rounded-lg p-4"><div className="bg-gradient-to-br from-orange-400 to-blue-400 h-32 flex items-center justify-center mb-4"><Play className="text-white" size={40} /></div><p className="font-semibold">{v.title}</p></div>)}</div></div>;
+      case 'videos': return <div><h2 className="text-3xl font-bold mb-6">All Videos</h2><div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{videos.map((v) => <VideoCard key={v.url} video={v} />)}</div></div>;
       case 'blog': return <div><h2 className="text-3xl font-bold mb-6">Blog</h2><div className="space-y-4"><div className="bg-white border border-gray-200 rounded-lg p-6"><h3 className="text-xl font-bold mb-2">How to Train for Your First Marathon</h3><p className="text-gray-700">16-week training plan, nutrition & recovery</p></div><div className="bg-white border border-gray-200 rounded-lg p-6"><h3 className="text-xl font-bold mb-2">Nutrition Guide for Runners</h3><p className="text-gray-700">Fueling your body for optimal performance</p></div></div></div>;
       case 'community': return <CommunitySection />;
       case 'support': return <SupportSection />;
