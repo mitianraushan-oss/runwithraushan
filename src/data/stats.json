@@ -1,0 +1,41 @@
+{
+  "lastUpdated": "2026-06-22",
+  "sinceDate": "February 2022",
+  "sinceYear": 2022,
+  "totals": {
+    "workouts": 922,
+    "distanceKm": 4733.8,
+    "distanceMi": 2941,
+    "runDistanceKm": 3610.1,
+    "runDistanceMi": 2243,
+    "hours": 681,
+    "calories": 311725,
+    "steps": 5356847
+  },
+  "byType": {
+    "Run": 558,
+    "Walk": 356,
+    "Bike Ride": 7,
+    "Swim": 1
+  },
+  "longest": {
+    "type": "Run",
+    "distanceKm": 42.4,
+    "distanceMi": 26.3,
+    "date": "January 2025"
+  },
+  "videosFromNotes": [
+    {
+      "url": "https://youtube.com/shorts/61BgNYqWaRM?si=gAR4jRlvoafTQeq8",
+      "type": "Run",
+      "distanceKm": 10,
+      "date": "2026-06-18"
+    },
+    {
+      "url": "https://youtube.com/shorts/pBfHB3ZEqU4?si=4BM_JiEq8HFtKyI0",
+      "type": "Run",
+      "distanceKm": 5.1,
+      "date": "2026-06-14"
+    }
+  ]
+}
