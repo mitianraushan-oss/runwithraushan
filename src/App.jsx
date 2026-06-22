@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { Heart, Play, TrendingUp, Users, MessageCircle, ChevronRight, Activity } from 'lucide-react';
 import stats from './data/stats.json';
 
-// Your public profiles. Paste the URLs and the buttons appear automatically;
-// leave a field empty to hide that link.
+// Your public profiles. Fill a field to make its link/text appear; leave it
+// empty to hide it.
 const PROFILES = {
-  mapmyrun: '', // e.g. https://www.mapmyrun.com/profile/<your-id>
-  strava: '',   // e.g. https://www.strava.com/athletes/<your-id>
+  strava: 'https://www.strava.com/athletes/155787378',
+  youtube: 'https://youtube.com/@raushanraavya',
+  // MapMyRun profile isn't public — visitors can find Raushan by searching
+  // this email inside the MapMyRun app.
+  mapmyrunEmail: 'raushan_jha47@yahoo.com',
 };
 
 // Featured videos. The first two were auto-detected from your MapMyRun notes.
@@ -100,24 +103,29 @@ export default function RunWithRaushanSite() {
           <span>{nf(stats.byType.Run || 0)} runs · {nf(stats.byType.Walk || 0)} walks</span>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-3 text-xs text-gray-500">
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-gray-500">
           <span>Synced from MapMyRun · updated {stats.lastUpdated}</span>
-          {PROFILES.mapmyrun && (
-            <a href={PROFILES.mapmyrun} target="_blank" rel="noopener noreferrer" className="font-semibold text-orange-600 hover:text-orange-700">
-              MapMyRun profile →
-            </a>
-          )}
           {PROFILES.strava && (
             <a href={PROFILES.strava} target="_blank" rel="noopener noreferrer" className="font-semibold text-orange-600 hover:text-orange-700">
               Strava profile →
             </a>
+          )}
+          {PROFILES.mapmyrunEmail && (
+            <span>Find me on MapMyRun — search <span className="font-semibold text-gray-700">{PROFILES.mapmyrunEmail}</span></span>
           )}
         </div>
       </div>
 
       {/* Latest Videos */}
       <div>
-        <h2 className="text-2xl sm:text-3xl font-bold mb-6">Latest Videos</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <h2 className="text-2xl sm:text-3xl font-bold">Latest Videos</h2>
+          {PROFILES.youtube && (
+            <a href={PROFILES.youtube} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-semibold hover:text-blue-700 flex items-center gap-2">
+              Visit my YouTube channel <ChevronRight size={16} />
+            </a>
+          )}
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {videos.map((video) => (
             <VideoCard key={video.url} video={video} />
@@ -323,7 +331,7 @@ export default function RunWithRaushanSite() {
   const renderSection = () => {
     switch(activeTab) {
       case 'about': return <AboutSection />;
-      case 'videos': return <div><h2 className="text-3xl font-bold mb-6">All Videos</h2><div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{videos.map((v) => <VideoCard key={v.url} video={v} />)}</div></div>;
+      case 'videos': return <div><div className="flex flex-wrap items-center justify-between gap-3 mb-6"><h2 className="text-3xl font-bold">All Videos</h2>{PROFILES.youtube && <a href={PROFILES.youtube} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-semibold hover:text-blue-700 flex items-center gap-2">Visit my YouTube channel <ChevronRight size={16} /></a>}</div><div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{videos.map((v) => <VideoCard key={v.url} video={v} />)}</div></div>;
       case 'blog': return <div><h2 className="text-3xl font-bold mb-6">Blog</h2><div className="space-y-4"><div className="bg-white border border-gray-200 rounded-lg p-6"><h3 className="text-xl font-bold mb-2">How to Train for Your First Marathon</h3><p className="text-gray-700">16-week training plan, nutrition & recovery</p></div><div className="bg-white border border-gray-200 rounded-lg p-6"><h3 className="text-xl font-bold mb-2">Nutrition Guide for Runners</h3><p className="text-gray-700">Fueling your body for optimal performance</p></div></div></div>;
       case 'community': return <CommunitySection />;
       case 'support': return <SupportSection />;
@@ -373,7 +381,7 @@ export default function RunWithRaushanSite() {
             <div>
               <h4 className="font-bold mb-4">Links</h4>
               <div className="flex flex-col gap-2 text-sm">
-                <a href="https://www.youtube.com/channel/UC83wrDjR5xOsfBfl4Nw8y9w" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition">YouTube</a>
+                <a href="https://youtube.com/@raushanraavya" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition">YouTube</a>
                 <a href="https://www.instagram.com/mitianraushan/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition">Instagram</a>
                 <a href="https://www.linkedin.com/in/raushan-kumar-58305258" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition">LinkedIn</a>
               </div>
