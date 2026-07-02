@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Heart, Play, TrendingUp, Users, MessageCircle, ChevronRight, Activity } from 'lucide-react';
-import stats from './data/stats.json';
+import baseline from './data/stats.json';
 
 // Your public profiles. Fill a field to make its link/text appear; leave it
 // empty to hide it.
@@ -37,8 +37,65 @@ const compact = (n) =>
   : n >= 1_000 ? `${(n / 1_000).toFixed(1)}K`
   : nf(n);
 
+const KM_TO_MI = 0.621371;
+const fmtMonthYear = (iso) => {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? null
+    : d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+};
+
+// Add the live Strava delta (activities after the baseline's export date,
+// from /api/strava) on top of the MapMyRun baseline in stats.json.
+const mergeStats = (base, delta) => {
+  const distanceKm = base.totals.distanceKm + delta.distanceKm;
+  const byType = { ...base.byType };
+  for (const [type, count] of Object.entries(delta.byType || {})) {
+    byType[type] = (byType[type] || 0) + count;
+  }
+  const longest =
+    delta.longestRunKm > base.longest.distanceKm
+      ? {
+          type: 'Run',
+          distanceKm: delta.longestRunKm,
+          distanceMi: Math.round(delta.longestRunKm * KM_TO_MI * 10) / 10,
+          date: fmtMonthYear(delta.longestRunDate) ?? base.longest.date,
+        }
+      : base.longest;
+  return {
+    ...base,
+    lastUpdated: delta.lastUpdated || base.lastUpdated,
+    totals: {
+      ...base.totals,
+      workouts: base.totals.workouts + delta.workouts,
+      distanceKm: Math.round(distanceKm * 10) / 10,
+      distanceMi: Math.round(distanceKm * KM_TO_MI),
+      hours: Math.round(base.totals.hours + delta.seconds / 3600),
+      steps: base.totals.steps + delta.steps,
+    },
+    byType,
+    longest,
+  };
+};
+
 export default function RunWithRaushanSite() {
   const [activeTab, setActiveTab] = useState('home');
+
+  // Live Strava delta; null until (and unless) /api/strava responds. In local
+  // `npm run dev` there is no /api — the fetch fails and the baseline shows.
+  const [live, setLive] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/strava?after=${baseline.lastUpdated}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!cancelled && d && typeof d.workouts === 'number') setLive(d);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  const stats = live ? mergeStats(baseline, live) : baseline;
 
   const navItems = [
     { id: 'home', label: 'Home' },
@@ -49,7 +106,8 @@ export default function RunWithRaushanSite() {
     { id: 'support', label: 'Support' },
   ];
 
-  // Headline tiles, all derived from your real MapMyRun export (src/data/stats.json).
+  // Headline tiles: MapMyRun baseline (src/data/stats.json) plus any live
+  // Strava activities recorded since that export.
   const statTiles = [
     { value: `${nf(stats.totals.distanceMi)} mi`, label: 'Total Distance', color: 'text-orange-600' },
     { value: nf(stats.totals.workouts), label: 'Workouts Logged', color: 'text-blue-600' },
@@ -104,7 +162,7 @@ export default function RunWithRaushanSite() {
         </div>
 
         <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-gray-500">
-          <span>Synced from MapMyRun · updated {stats.lastUpdated}</span>
+          <span>Synced from {live ? 'MapMyRun + Strava' : 'MapMyRun'} · updated {stats.lastUpdated}</span>
           {PROFILES.strava && (
             <a href={PROFILES.strava} target="_blank" rel="noopener noreferrer" className="font-semibold text-orange-600 hover:text-orange-700">
               Strava profile →

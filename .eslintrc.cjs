@@ -9,6 +9,10 @@ module.exports = {
   ],
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
   settings: { react: { version: 'detect' } },
+  // Server-side code (Vercel functions, build scripts) runs under Node.
+  overrides: [
+    { files: ['api/**/*.js', 'scripts/**/*.{js,mjs}'], env: { node: true, browser: false } },
+  ],
   plugins: ['react-refresh'],
   ignorePatterns: ['dist', 'node_modules'],
   rules: {

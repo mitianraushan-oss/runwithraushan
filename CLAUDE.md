@@ -15,6 +15,14 @@ There is **no test script** and no Prettier/Biome formatter. Don't assume those 
 
 React 18 + Vite 4 + Tailwind CSS 3, plain **JavaScript/JSX (no TypeScript)**, npm. Single-page app, not a monorepo. Nearly all UI lives in `src/App.jsx`; `src/main.jsx` renders it and `src/index.css` holds Tailwind directives + a global reset.
 
+## Stats pipeline
+
+Homepage stats = **MapMyRun baseline + live Strava delta**:
+
+- Baseline: `npm run stats` parses a MapMyRun CSV export (`data/workout_history.csv`, gitignored) into `src/data/stats.json` (committed).
+- Live delta: `api/strava.js` is a Vercel serverless function that aggregates Strava activities recorded after the baseline's `lastUpdated` date. The client fetches `/api/strava?after=<date>` on load and merges via `mergeStats` in `App.jsx`; if the fetch fails (e.g. plain `npm run dev`, which has no `/api`), the baseline renders alone. Use `vercel dev` to exercise the function locally.
+- It needs `STRAVA_CLIENT_ID` / `STRAVA_CLIENT_SECRET` / `STRAVA_REFRESH_TOKEN` env vars; obtain the refresh token once with `scripts/strava-auth.mjs`.
+
 ## Conventions
 
 - **No React Router.** Navigation is state-driven via tabs (`useState` in `App.jsx`) — add pages as conditional render branches, not routes.
